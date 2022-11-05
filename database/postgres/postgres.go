@@ -16,9 +16,9 @@ import (
 
 	"go.uber.org/atomic"
 
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database"
-	"github.com/golang-migrate/migrate/v4/database/multistmt"
+	"github.com/greboid/migrate/v4"
+	"github.com/greboid/migrate/v4/database"
+	"github.com/greboid/migrate/v4/database/multistmt"
 	"github.com/hashicorp/go-multierror"
 	"github.com/lib/pq"
 )
@@ -370,7 +370,7 @@ func (p *Postgres) SetVersion(version int, dirty bool) error {
 
 	// Also re-write the schema version for nil dirty versions to prevent
 	// empty schema version for failed down migration on the first migration
-	// See: https://github.com/golang-migrate/migrate/issues/330
+	// See: https://github.com/greboid/migrate/issues/330
 	if version >= 0 || (version == database.NilVersion && dirty) {
 		query = `INSERT INTO ` + pq.QuoteIdentifier(p.config.migrationsSchemaName) + `.` + pq.QuoteIdentifier(p.config.migrationsTableName) + ` (version, dirty) VALUES ($1, $2)`
 		if _, err := tx.Exec(query, version, dirty); err != nil {
@@ -484,10 +484,10 @@ func (p *Postgres) ensureVersionTable() (err error) {
 		return nil
 	}
 
-        query = `CREATE SCHEMA IF NOT EXISTS ` + pq.QuoteIdentifier(p.config.migrationsSchemaName)
-        if _, err = p.conn.ExecContext(context.Background(), query); err != nil {
-                return &database.Error{OrigErr: err, Query: []byte(query)}
-        }
+	query = `CREATE SCHEMA IF NOT EXISTS ` + pq.QuoteIdentifier(p.config.migrationsSchemaName)
+	if _, err = p.conn.ExecContext(context.Background(), query); err != nil {
+		return &database.Error{OrigErr: err, Query: []byte(query)}
+	}
 
 	query = `CREATE TABLE IF NOT EXISTS ` + pq.QuoteIdentifier(p.config.migrationsSchemaName) + `.` + pq.QuoteIdentifier(p.config.migrationsTableName) + ` (version bigint not null primary key, dirty boolean not null)`
 	if _, err = p.conn.ExecContext(context.Background(), query); err != nil {

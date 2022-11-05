@@ -1,7 +1,5 @@
 module github.com/greboid/migrate/v4
 
-replace github.com/golang-migrate/migrate => github.com/greboid/migrate
-
 require (
 	cloud.google.com/go/spanner v1.34.1
 	cloud.google.com/go/storage v1.23.0
