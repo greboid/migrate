@@ -484,6 +484,11 @@ func (p *Postgres) ensureVersionTable() (err error) {
 		return nil
 	}
 
+        query = `CREATE SCHEMA IF NOT EXISTS ` + pq.QuoteIdentifier(p.config.migrationsSchemaName)
+        if _, err = p.conn.ExecContext(context.Background(), query); err != nil {
+                return &database.Error{OrigErr: err, Query: []byte(query)}
+        }
+
 	query = `CREATE TABLE IF NOT EXISTS ` + pq.QuoteIdentifier(p.config.migrationsSchemaName) + `.` + pq.QuoteIdentifier(p.config.migrationsTableName) + ` (version bigint not null primary key, dirty boolean not null)`
 	if _, err = p.conn.ExecContext(context.Background(), query); err != nil {
 		return &database.Error{OrigErr: err, Query: []byte(query)}
